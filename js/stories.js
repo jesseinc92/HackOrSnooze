@@ -50,3 +50,21 @@ function putStoriesOnPage() {
 
   $allStoriesList.show();
 }
+
+/** Gets new story details from form and then puts on page. */
+
+async function createNewStory() {
+  console.debug('createNewStory');
+
+  let newStory = await storyList.addStory(currentUser, {
+    title: $newStoryTitle.val(),
+    author: $newStoryAuthor.val(),
+    url: $newStoryUrl.val()
+  });
+
+  // TODO: FINISH THIS
+  $storyForm.hide();
+  putStoriesOnPage();
+}
+
+$storyForm.on('submit', createNewStory);

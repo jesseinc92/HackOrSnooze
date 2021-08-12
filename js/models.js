@@ -77,8 +77,8 @@ async addStory(user, newStory) {
     const response = await axios.post(`${BASE_URL}/stories`, {
       token: user.loginToken,
       story: {
-        author: newStory.author,
         title: newStory.title,
+        author: newStory.author,
         url: newStory.url
       }
     });
