@@ -23,14 +23,26 @@ function generateStoryMarkup(story) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
+  const showChecked = Boolean(currentUser);
+  let checkStatus;
+
+  if (showChecked) {
+    checkStatus = currentUser.isFavorite(story) ? 'checked' : '';
+  } else {
+    checkStatus = '';
+  }
+
   return $(`
       <li id="${story.storyId}">
-        <a href="${story.url}" target="a_blank" class="story-link">
-          ${story.title}
-        </a>
-        <small class="story-hostname">(${hostName})</small>
-        <small class="story-author">by ${story.author}</small>
-        <small class="story-user">posted by ${story.username}</small>
+        <label>
+          <input type="checkbox" class="favorite" ${checkStatus}>
+        </label>
+          <a href="${story.url}" target="a_blank" class="story-link">
+            ${story.title}
+          </a>
+          <small class="story-hostname">(${hostName})</small>
+          <small class="story-author">by ${story.author}</small>
+          <small class="story-user">posted by ${story.username}</small>
       </li>
     `);
 }
@@ -51,12 +63,29 @@ function putStoriesOnPage() {
   $allStoriesList.show();
 }
 
+/** Gets list of current user favorites, generates their HTML, and puts on page. */
+
+function putFavoritesOnPage() {
+  // TODO
+  console.debug('putFavoritesOnPage');
+
+  $favoritesList.empty();
+
+  // loop through all of the favorited stories and generate HTML for them
+  for (let story of currentUser.favorites) {
+    const $favorite = generateStoryMarkup(story);
+    $favoritesList.append($favorite);
+  }
+
+  $favoritesList.show();
+}
+
 /** Gets new story details from form and then puts on page. */
 
 async function createNewStory() {
   console.debug('createNewStory');
 
-  let newStory = await storyList.addStory(currentUser, {
+  await storyList.addStory(currentUser, {
     title: $newStoryTitle.val(),
     author: $newStoryAuthor.val(),
     url: $newStoryUrl.val()
@@ -68,3 +97,19 @@ async function createNewStory() {
 }
 
 $storyForm.on('submit', createNewStory);
+
+/** Gets storyId and username for favorite */
+
+async function handleFavoriteButton(evt) {
+  // get the storyId from the li attribute
+  const storyId = evt.target.closest('li').id;
+  const story = storyList.stories.find(story => story.storyId === storyId);
+
+  if(!evt.currentTarget.checked) {
+    await currentUser.removeFavorite(currentUser, story);
+  } else {
+    await currentUser.addFavorite(currentUser, story);
+  }
+}
+
+$body.on('click', '.favorite', handleFavoriteButton);

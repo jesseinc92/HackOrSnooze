@@ -202,4 +202,22 @@ class User {
       return null;
     }
   }
+
+  /** Adds selected story to the favorites object */
+
+  async addFavorite(user, story) {
+    this.favorites.push(story);
+    await axios.post(`${BASE_URL}/users/${user.username}/favorites/${story.storyId}`, { token: user.loginToken });
+  }
+
+  // TODO: CORRECTLY IMPLEMENT BOTH FUNCTIONS
+
+  async removeFavorite(user, story) {
+    this.favorites = this.favorites.filter(remFave => remFave.storyId !== story.storyId);
+    await axios.delete(`${BASE_URL}/users/${user.username}/favorites/${story.storyId}`, { data: { token: user.loginToken }});
+  }
+
+  isFavorite(story) {
+    return this.favorites.some(userFave => (userFave.storyId === story.storyId));
+  }
 }
