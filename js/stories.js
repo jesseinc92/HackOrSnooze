@@ -25,21 +25,12 @@ function generateStoryMarkup(story, showDeleteButton = false) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
-  const showChecked = Boolean(currentUser);
-  let checkStatus;
-
-  if (showChecked) {
-    checkStatus = currentUser.isFavorite(story) ? 'checked' : '';
-  } else {
-    checkStatus = '';
-  }
+  const showFavorite = Boolean(currentUser);
 
   return $(`
       <li id="${story.storyId}">
         ${showDeleteButton ? generateDeleteButton() : ''}
-        <label>
-          <input type="checkbox" class="favorite" ${checkStatus}>
-        </label>
+        ${showFavorite ? generateFavoriteButton(currentUser, story) : ''}
           <a href="${story.url}" target="a_blank" class="story-link">
             ${story.title}
           </a>
@@ -53,7 +44,20 @@ function generateStoryMarkup(story, showDeleteButton = false) {
 /** generates HTML for the delete button */
 
 function generateDeleteButton() {
-  return '<div class="delete-button">X</div>';
+  return `<div class="delete-button">
+            <i class="fas fa-trash"></i>
+          </div>`;
+}
+
+/** generates HTML for the favorite button */
+
+function generateFavoriteButton(user, story) {
+  const isFavorite = user.isFavorite(story);
+  const heartType = isFavorite ? 'fas' : 'far';
+
+  return `<div class="favorite">
+            <i class="${heartType} fa-heart"></i>
+          </div>`;
 }
 
 /** Gets list of stories from server, generates their HTML, and puts on page. */
@@ -131,10 +135,14 @@ async function handleFavoriteButton(evt) {
   const storyId = evt.target.closest('li').id;
   const story = storyList.stories.find(story => story.storyId === storyId);
 
-  if(!evt.currentTarget.checked) {
+  if(evt.target.classList.contains('fas')) {
     await currentUser.removeFavorite(currentUser, story);
+    evt.target.classList.toggle("fas");
+    evt.target.classList.toggle("far");
   } else {
     await currentUser.addFavorite(currentUser, story);
+    evt.target.classList.toggle("far");
+    evt.target.classList.toggle("fas");
   }
 }
 

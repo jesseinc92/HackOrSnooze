@@ -22,6 +22,7 @@
 .delete-button, .favorite {
   cursor: pointer;
   display: inline;
+  margin: 0 0.25rem;
 }
 
 .story-link {
@@ -41,5 +42,5 @@
 
 .story-user {
   display: block;
-  margin-left: 1.5rem;
+  margin-left: 3rem;
 }
