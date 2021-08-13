@@ -83,6 +83,10 @@ function putFavoritesOnPage() {
 
   $favoritesList.empty();
 
+  if (currentUser.favorites.length === 0) {
+    $favoritesList.append('<h5>No favorites added!</h5>');
+  }
+
   // loop through all of the favorited stories and generate HTML for them
   for (let story of currentUser.favorites) {
     const $favorite = generateStoryMarkup(story);
@@ -100,6 +104,9 @@ function putUserStoriesOnPage() {
   $userStoriesList.empty();
 
   const userStories = currentUser.ownStories;
+  if (userStories.length === 0) {
+    $userStoriesList.append('<h5>No stories added!</h5>');
+  }
 
   //loop through all of the user stories and generate HTML for them
   for (let story of userStories) {
