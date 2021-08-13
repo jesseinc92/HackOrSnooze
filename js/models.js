@@ -73,8 +73,7 @@ class StoryList {
    * Returns the new Story instance
    */
 
-async addStory(user, newStory) {
-    console.log({user, newStory});
+  async addStory(user, newStory) {
     const response = await axios.post(`${BASE_URL}/stories`, {
       token: user.loginToken,
       story: {
@@ -84,11 +83,23 @@ async addStory(user, newStory) {
       }
     });
     
+    // update user lists
     const story = new Story(response.data.story);
     this.stories.unshift(story);
     user.ownStories.unshift(story);
 
     return story;
+  }
+
+  async removeStory(user, storyId) {
+    await axios.delete(`${BASE_URL}/stories/${storyId}`, {
+      data: { token: user.loginToken }
+    });
+
+    // update user lists
+    this.stories = this.stories.filter(s => s.storyId !== storyId);
+    user.ownStories = user.ownStories.filter(s => s.storyId !== storyId);
+    user.favorites = user.favorites.filter(s => s.storyId !== storyId);
   }
 }
 

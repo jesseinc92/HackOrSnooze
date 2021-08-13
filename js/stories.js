@@ -9,6 +9,8 @@ async function getAndShowStoriesOnStart() {
   storyList = await StoryList.getStories();
   $storiesLoadingMsg.remove();
 
+  $favoritesList.hide();
+  $userStoriesList.hide();
   putStoriesOnPage();
 }
 
@@ -19,7 +21,7 @@ async function getAndShowStoriesOnStart() {
  * Returns the markup for the story.
  */
 
-function generateStoryMarkup(story) {
+function generateStoryMarkup(story, showDeleteButton = false) {
   // console.debug("generateStoryMarkup", story);
 
   const hostName = story.getHostName();
@@ -34,6 +36,7 @@ function generateStoryMarkup(story) {
 
   return $(`
       <li id="${story.storyId}">
+        ${showDeleteButton ? generateDeleteButton() : ''}
         <label>
           <input type="checkbox" class="favorite" ${checkStatus}>
         </label>
@@ -45,6 +48,12 @@ function generateStoryMarkup(story) {
           <small class="story-user">posted by ${story.username}</small>
       </li>
     `);
+}
+
+/** generates HTML for the delete button */
+
+function generateDeleteButton() {
+  return '<div class="delete-button">X</div>';
 }
 
 /** Gets list of stories from server, generates their HTML, and puts on page. */
@@ -90,7 +99,7 @@ function putUserStoriesOnPage() {
 
   //loop through all of the user stories and generate HTML for them
   for (let story of userStories) {
-    const $userStory = generateStoryMarkup(story);
+    const $userStory = generateStoryMarkup(story, true);
     $userStoriesList.append($userStory);
   }
 
@@ -117,6 +126,7 @@ $storyForm.on('submit', createNewStory);
 /** Gets storyId and username for favorite */
 
 async function handleFavoriteButton(evt) {
+  console.debug('handleFavoriteButton');
   // get the storyId from the li attribute
   const storyId = evt.target.closest('li').id;
   const story = storyList.stories.find(story => story.storyId === storyId);
@@ -129,3 +139,18 @@ async function handleFavoriteButton(evt) {
 }
 
 $body.on('click', '.favorite', handleFavoriteButton);
+
+/** Gets story information and deletes it */
+
+async function deleteStory(evt) {
+  console.debug('deleteStory');
+
+  // get the storyId from the li attribute
+  const storyId = evt.target.closest('li').id;
+
+  // update the story list and then re-display the user-story list
+  await storyList.removeStory(currentUser, storyId);
+  putUserStoriesOnPage();
+}
+
+$body.on('click', '.delete-button', deleteStory);
