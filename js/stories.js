@@ -66,7 +66,6 @@ function putStoriesOnPage() {
 /** Gets list of current user favorites, generates their HTML, and puts on page. */
 
 function putFavoritesOnPage() {
-  // TODO
   console.debug('putFavoritesOnPage');
 
   $favoritesList.empty();
@@ -80,6 +79,24 @@ function putFavoritesOnPage() {
   $favoritesList.show();
 }
 
+/** Gets list of user-made stories, generates their HTML, and puts on page. */
+
+function putUserStoriesOnPage() {
+  console.debug('putUserStoriesOnPage');
+
+  $userStoriesList.empty();
+
+  const userStories = currentUser.ownStories;
+
+  //loop through all of the user stories and generate HTML for them
+  for (let story of userStories) {
+    const $userStory = generateStoryMarkup(story);
+    $userStoriesList.append($userStory);
+  }
+
+  $userStoriesList.show();
+}
+
 /** Gets new story details from form and then puts on page. */
 
 async function createNewStory() {
@@ -91,7 +108,6 @@ async function createNewStory() {
     url: $newStoryUrl.val()
   });
 
-  // TODO: FINISH THIS
   $storyForm.hide();
   putStoriesOnPage();
 }

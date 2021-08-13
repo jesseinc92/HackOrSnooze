@@ -74,6 +74,7 @@ class StoryList {
    */
 
 async addStory(user, newStory) {
+    console.log({user, newStory});
     const response = await axios.post(`${BASE_URL}/stories`, {
       token: user.loginToken,
       story: {
@@ -82,8 +83,12 @@ async addStory(user, newStory) {
         url: newStory.url
       }
     });
+    
+    const story = new Story(response.data.story);
+    this.stories.unshift(story);
+    user.ownStories.unshift(story);
 
-    return new Story(response.data.story);
+    return story;
   }
 }
 
@@ -210,7 +215,7 @@ class User {
     await axios.post(`${BASE_URL}/users/${user.username}/favorites/${story.storyId}`, { token: user.loginToken });
   }
 
-  // TODO: CORRECTLY IMPLEMENT BOTH FUNCTIONS
+  /** Removes selected story from the favorites object */
 
   async removeFavorite(user, story) {
     this.favorites = this.favorites.filter(remFave => remFave.storyId !== story.storyId);
